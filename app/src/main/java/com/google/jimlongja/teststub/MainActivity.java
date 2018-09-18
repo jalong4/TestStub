@@ -1,18 +1,22 @@
 package com.google.jimlongja.teststub;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Point;
+import android.hardware.display.DisplayManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import java.lang.reflect.Method;
 
 import java.util.Properties;
+import java.util.UUID;
 
 import static android.text.TextUtils.split;
 
@@ -23,36 +27,20 @@ public class MainActivity extends Activity {
     TextView mTextHeight;
     TextView mTextIsUHD;
     TextView mTextRefreshRate;
+
+    Button mBtnReadSysProp;
+    TextView mTextSysPropWidth;
+    TextView mTextSysPropHeight;
+
+    Button mBtnReadVendorProp;
+    TextView mTextVendorPropWidth;
+    TextView mTextVendorPropHeight;
+
     private static final String TAG = "TestStub";
     private static final String ANDROID_SYSTEM_PROPERTIES_CLASS = "android.os.SystemProperties";
-
-    private class DisplayMode {
-        int width;
-        int height;
-        float refreshRate;
-
-        DisplayMode() {
-            this.width = 0;
-            this.height = 0;
-            this.refreshRate = 0.0f;
-        }
-
-        DisplayMode(Display.Mode mode) {
-            this.width = mode.getPhysicalWidth();
-            this.height = mode.getPhysicalHeight();
-            this.refreshRate = mode.getRefreshRate();
-        }
-
-        @Override
-        public String toString() {
-            return new StringBuilder("{")
-                    .append(", width=").append(width)
-                    .append(", height=").append(height)
-                    .append(", fps=").append(refreshRate)
-                    .append("}")
-                    .toString();
-        }
-    }
+    private static final String SYS_DISPLAY_SIZE = "sys.display-size";
+    private static final String VENDOR_DISPLAY_SIZE = "vendor.display-size";
+    private static final UUID WIDEVINE_UUID = new UUID(0xEDEF8BA979D64ACEL, 0xA3C827DCD51D21EDL);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,98 +53,96 @@ public class MainActivity extends Activity {
         mTextRefreshRate = (TextView) findViewById(R.id.text_RefreshRate);
         mTextIsUHD = (TextView) findViewById(R.id.text_isUHD);
 
+        mBtnReadSysProp = (Button) findViewById(R.id.button_getSysProp);
+        mTextSysPropWidth = (TextView) findViewById(R.id.text_sysPropWidth);
+        mTextSysPropHeight = (TextView) findViewById(R.id.text_sysPropHeight);
+
+        mBtnReadVendorProp = (Button) findViewById(R.id.button_getVendorProp);
+        mTextVendorPropWidth = (TextView) findViewById(R.id.text_vendorPropWidth);
+        mTextVendorPropHeight = (TextView) findViewById(R.id.text_vendorPropHeight);
+
         mBtnCallAPI.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DisplayMode mode = getMaxDisplayMode();
-                mTextWidth.setText("Width\n" + Integer.toString(mode.width));
-                mTextHeight.setText("Height\n" + Integer.toString(mode.height));
-                mTextRefreshRate.setText("Refresh Rate\n" + Float.toString(mode.refreshRate));
-                mTextIsUHD.setText("UHD\n" + (isUHD(mode) ? "Yes" : "No"));
+                callDisplayModeAPI();
             }
         });
 
-        Point displaySize = getSystemDisplaySize();
-        Log.i(TAG, "sys.display-size: width=" + Integer.toString(displaySize.x) + " height=" + Integer.toString(displaySize.y) + "\n");
 
-//        displaySize = getVendorDisplaySize();
-//        Log.i(TAG, "vendor.display-size: width=" + Integer.toString(displaySize.x) + " height=" + Integer.toString(displaySize.y) + "\n");
+        mBtnReadSysProp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                updateSystemProperties();
+            }
+        });
 
+
+        mBtnReadVendorProp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        callDisplayModeAPI();
+        updateSystemProperties();
+        updateVendorProperties();
+
+    }
+
+    public void callDisplayModeAPI() {
+        Display.Mode mode = getMaxDisplayMode();
+        mTextWidth.setText("Width\n" + Integer.toString(mode.getPhysicalWidth()));
+        mTextHeight.setText("Height\n" + Integer.toString(mode.getPhysicalHeight()));
+        mTextRefreshRate.setText("Refresh Rate\n" + Float.toString(mode.getRefreshRate()));
+        mTextIsUHD.setText("UHD\n" + (isUHD(mode) ? "Yes" : "No"));
+        Log.i(TAG, "Display.Mode API: width=" + Integer.toString(mode.getPhysicalWidth()) + " height=" + Integer.toString(mode.getPhysicalHeight()) + " refresh Rate=" + Float.toString(mode.getRefreshRate()) + "\n");
+    }
+
+    public void updateSystemProperties() {
+        Point displaySize = getDisplaySizeFromProperties(SYS_DISPLAY_SIZE);
+        mTextSysPropWidth.setText("Width\n" + Integer.toString(displaySize.x));
+        mTextSysPropHeight.setText("Height\n" + Integer.toString(displaySize.y));
+        Log.i(TAG, SYS_DISPLAY_SIZE + ": width=" + Integer.toString(displaySize.x) + " height=" + Integer.toString(displaySize.y) + "\n");
+    }
+
+    public void updateVendorProperties() {
+        Point displaySize = getDisplaySizeFromProperties(VENDOR_DISPLAY_SIZE);
+        mTextVendorPropWidth.setText("Width\n" + Integer.toString(displaySize.x));
+        mTextVendorPropHeight.setText("Height\n" + Integer.toString(displaySize.y));
+        Log.i(TAG, VENDOR_DISPLAY_SIZE + ": width=" + Integer.toString(displaySize.x) + " height=" + Integer.toString(displaySize.y) + "\n");
     }
 
     public boolean isUHD(){
         return isUHD(getMaxDisplayMode());
     }
 
-    public boolean isUHD(DisplayMode mode) {
-        boolean result = (mode.width >= 3840 && mode.height >= 2160);
-        Log.i(TAG, "UHD = " + (result ? "Yes" : "No"));
+    public boolean isUHD(Display.Mode mode) {
+        boolean result = (mode.getPhysicalWidth() >= 3840 && mode.getPhysicalHeight() >= 2160);
         return result;
     }
 
-    public DisplayMode getMaxDisplayMode() {
-        Display display = getWindowManager().getDefaultDisplay();
-        DisplayMode max = new DisplayMode();
-
-        DisplayMetrics metrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
-        Display.Mode[] modes = display.getSupportedModes();
-
-        for (Display.Mode mode : modes) {
-            int width = mode.getPhysicalWidth();
-            if (max.width < width) {
-                max = new DisplayMode(mode);
-            }
-        }
-
-        Log.i(TAG, max.toString());
-
-        return max;
+    public Display.Mode getMaxDisplayMode() {
+        return getWindowManager().getDefaultDisplay().getMode();
     }
 
-    public Point getSystemDisplaySize() {
+    public Point getDisplaySizeFromProperties(String prop) {
 
         String displaySize = null;
 
         try {
             Class<?> systemProperties = Class.forName(ANDROID_SYSTEM_PROPERTIES_CLASS);
             Method getMethod = systemProperties.getMethod("get", String.class);
-            displaySize = (String) getMethod.invoke(systemProperties, "sys.display-size");
+            displaySize = (String) getMethod.invoke(systemProperties, prop);
         } catch (Exception e) {
-            Log.e(TAG, "Failed to read sys.display-size", e);
+            Log.e(TAG, "Failed to read " + prop, e);
             return new Point(0, 0);
         }
 
         // If we managed to read sys.display-size, attempt to parse it.
-        return parseDisplaySizeProperty(displaySize);
-
-
-    }
-
-    public Point getVendorDisplaySize() {
-
-        String displaySize = null;
-
-        try {
-            Class<?> vendorProperties = Class.forName("android.os.VendorProperties");
-            Method getMethod = vendorProperties.getMethod("get", String.class);
-            displaySize = (String) getMethod.invoke(vendorProperties, "vendor.display-size");
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to read vendor.display-size", e);
-            return new Point(0, 0);
-        }
-
-        // If we managed to read sys.display-size, attempt to parse it.
-        return parseDisplaySizeProperty(displaySize);
-
-
-    }
-
-    private Point parseDisplaySizeProperty(String prop) {
-        if (!TextUtils.isEmpty(prop)) {
+        if (!TextUtils.isEmpty(displaySize)) {
             try {
-                String[] propParts = split(prop.trim(), "x");
+                String[] propParts = split(displaySize.trim(), "x");
                 if (propParts.length == 2) {
                     int width = Integer.parseInt(propParts[0]);
                     int height = Integer.parseInt(propParts[1]);
@@ -167,10 +153,12 @@ public class MainActivity extends Activity {
             } catch (NumberFormatException e) {
                 return new Point(0, 0);
             }
-            Log.e(TAG, "Invalid property: " + prop);
+            Log.e(TAG, "Invalid property: " + displaySize);
         }
 
         return new Point(0, 0);
+
+
     }
 
 }
