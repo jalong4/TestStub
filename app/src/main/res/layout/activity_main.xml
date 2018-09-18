@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <Button
+        android:id="@+id/button_callAPI"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Call API"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/text_Height"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:text="Height\n0.0"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/button_callAPI"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_goneMarginLeft="@dimen/lb_details_description_body_text_size" />
+
+    <TextView
+        android:id="@+id/text_Width"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:text="Width\n0.0"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_goneMarginLeft="@dimen/lb_details_description_body_text_size"
+        app:layout_constraintLeft_toRightOf="@id/text_Height"/>
+
+    <TextView
+        android:id="@+id/text_RefreshRate"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:text="Refresh Rate\nUnknown"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_goneMarginLeft="@dimen/lb_details_description_body_text_size"
+        app:layout_constraintLeft_toRightOf="@id/text_Width"/>
+    <TextView
+        android:id="@+id/text_isUHD"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:text="UHD\nUnknown"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_goneMarginLeft="@dimen/lb_details_description_body_text_size"
+        app:layout_constraintLeft_toRightOf="@id/text_RefreshRate"/>
+
+</android.support.constraint.ConstraintLayout>
