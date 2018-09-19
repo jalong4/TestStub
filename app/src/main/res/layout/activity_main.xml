@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -26,7 +24,7 @@
         android:text="Height\n0.0"
         android:textAlignment="center"
         app:layout_constraintLeft_toRightOf="@id/button_callAPI"
-        app:layout_constraint="@+id/button_callAPI"
+        app:layout_constraintTop_toTopOf="@+id/button_callAPI"
         app:layout_goneMarginLeft="@dimen/lb_details_description_title_line_spacing" />
 
     <TextView
