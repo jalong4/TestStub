@@ -1,164 +1,167 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingTop="@dimen/lb_browse_rows_margin_top"
+    android:paddingLeft="50dp"
     tools:context=".MainActivity">
+
 
     <Button
         android:id="@+id/button_callAPI"
         android:layout_width="120dp"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:text="Call API"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/text_Height"
-        android:layout_width="80dp"
+        android:layout_width="100dp"
         android:layout_height="40dp"
         android:text="Height\n0.0"
         android:textAlignment="center"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@id/button_callAPI"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_goneMarginLeft="@dimen/lb_details_description_body_text_size" />
+        app:layout_constraint="@+id/button_callAPI"
+        app:layout_goneMarginLeft="@dimen/lb_details_description_title_line_spacing" />
 
     <TextView
         android:id="@+id/text_Width"
-        android:layout_width="80dp"
+        android:layout_width="100dp"
         android:layout_height="40dp"
         android:text="Width\n0.0"
         android:textAlignment="center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_goneMarginLeft="@dimen/lb_details_description_body_text_size"
-        app:layout_constraintLeft_toRightOf="@id/text_Height"/>
+        app:layout_constraintLeft_toRightOf="@id/text_Height"
+        app:layout_constraintTop_toTopOf="@+id/button_callAPI"
+        app:layout_goneMarginLeft="@dimen/lb_details_description_title_line_spacing" />
 
     <TextView
         android:id="@+id/text_RefreshRate"
-        android:layout_width="80dp"
+        android:layout_width="100dp"
         android:layout_height="40dp"
         android:text="Refresh Rate\nUnknown"
         android:textAlignment="center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_goneMarginLeft="@dimen/lb_details_description_body_text_size"
-        app:layout_constraintLeft_toRightOf="@id/text_Width"/>
+        app:layout_constraintLeft_toRightOf="@id/text_Width"
+        app:layout_constraintTop_toTopOf="@+id/button_callAPI"
+        app:layout_goneMarginLeft="@dimen/lb_details_description_title_line_spacing" />
+
     <TextView
         android:id="@+id/text_isUHD"
-        android:layout_width="80dp"
+        android:layout_width="100dp"
         android:layout_height="40dp"
         android:text="UHD\nUnknown"
         android:textAlignment="center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_goneMarginLeft="@dimen/lb_details_description_body_text_size"
-        app:layout_constraintLeft_toRightOf="@id/text_RefreshRate"/>
+        app:layout_constraintLeft_toRightOf="@id/text_RefreshRate"
+        app:layout_constraintTop_toTopOf="@+id/button_callAPI"
+        app:layout_goneMarginLeft="@dimen/lb_details_description_title_line_spacing" />
 
     <Button
         android:id="@+id/button_getSysProp"
         android:layout_width="120dp"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:text="Sys Props"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button_callAPI" />
 
     <TextView
         android:id="@+id/text_sysPropHeight"
-        android:layout_width="80dp"
+        android:layout_width="100dp"
         android:layout_height="40dp"
         android:text="Height\n0.0"
         android:textAlignment="center"
         app:layout_constraintLeft_toRightOf="@id/button_getSysProp"
         app:layout_constraintTop_toTopOf="@+id/button_getSysProp"
-        app:layout_goneMarginLeft="@dimen/lb_details_description_body_text_size" />
+        app:layout_goneMarginLeft="@dimen/lb_details_description_title_line_spacing" />
 
     <TextView
         android:id="@+id/text_sysPropWidth"
-        android:layout_width="80dp"
+        android:layout_width="100dp"
         android:layout_height="40dp"
         android:text="Width\n0.0"
         android:textAlignment="center"
         app:layout_constraintLeft_toRightOf="@id/text_sysPropHeight"
         app:layout_constraintTop_toTopOf="@+id/button_getSysProp"
-        app:layout_goneMarginLeft="@dimen/lb_details_description_body_text_size" />
+        app:layout_goneMarginLeft="@dimen/lb_details_description_title_line_spacing" />
 
     <Button
         android:id="@+id/button_getVendorProp"
         android:layout_width="120dp"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:text="Vendor Props"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button_getSysProp" />
 
     <TextView
         android:id="@+id/text_vendorPropHeight"
-        android:layout_width="80dp"
+        android:layout_width="100dp"
         android:layout_height="40dp"
         android:text="Height\n0.0"
         android:textAlignment="center"
         app:layout_constraintLeft_toRightOf="@id/button_getVendorProp"
         app:layout_constraintTop_toTopOf="@+id/button_getVendorProp"
-        app:layout_goneMarginLeft="@dimen/lb_details_description_body_text_size" />
+        app:layout_goneMarginLeft="@dimen/lb_details_description_title_line_spacing" />
 
     <TextView
         android:id="@+id/text_vendorPropWidth"
-        android:layout_width="80dp"
+        android:layout_width="100dp"
         android:layout_height="40dp"
         android:text="Width\n0.0"
         android:textAlignment="center"
         app:layout_constraintLeft_toRightOf="@id/text_vendorPropHeight"
         app:layout_constraintTop_toTopOf="@+id/button_getVendorProp"
-        app:layout_goneMarginLeft="@dimen/lb_details_description_body_text_size" />
+        app:layout_goneMarginLeft="@dimen/lb_details_description_title_line_spacing" />
 
     <Button
         android:id="@+id/button_getDrmInfo"
         android:layout_width="120dp"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:text="Widevine DRM Info"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button_getVendorProp" />
 
     <TextView
         android:id="@+id/text_maxHdcpLevel"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:layout_width="100dp"
+        android:layout_height="60dp"
         android:text="Max HDCP Level\nUnknown"
         android:textAlignment="center"
         app:layout_constraintLeft_toRightOf="@id/button_getDrmInfo"
         app:layout_constraintTop_toTopOf="@+id/button_getDrmInfo"
-        app:layout_goneMarginLeft="@dimen/lb_details_description_body_text_size" />
+        app:layout_goneMarginLeft="@dimen/lb_details_description_title_line_spacing" />
 
     <TextView
         android:id="@+id/text_connectedHdcpLevel"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:layout_width="100dp"
+        android:layout_height="60dp"
         android:text="Connected HDCP Level\nUnknown"
         android:textAlignment="center"
         app:layout_constraintLeft_toRightOf="@id/text_maxHdcpLevel"
         app:layout_constraintTop_toTopOf="@+id/button_getDrmInfo"
-        app:layout_goneMarginLeft="@dimen/lb_details_description_body_text_size" />
+        app:layout_goneMarginLeft="@dimen/lb_details_description_title_line_spacing" />
 
     <TextView
         android:id="@+id/text_maxSessions"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:layout_width="100dp"
+        android:layout_height="60dp"
         android:text="Max Sessions\nUnknown"
         android:textAlignment="center"
         app:layout_constraintLeft_toRightOf="@id/text_connectedHdcpLevel"
         app:layout_constraintTop_toTopOf="@+id/button_getDrmInfo"
-        app:layout_goneMarginLeft="@dimen/lb_details_description_body_text_size" />
+        app:layout_goneMarginLeft="@dimen/lb_details_description_title_line_spacing" />
 
     <TextView
         android:id="@+id/text_connectedSessions"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:layout_width="100dp"
+        android:layout_height="60dp"
         android:text="Connected Sessions\nUnknown"
         android:textAlignment="center"
         app:layout_constraintLeft_toRightOf="@id/text_maxSessions"
         app:layout_constraintTop_toTopOf="@+id/button_getDrmInfo"
-        app:layout_goneMarginLeft="@dimen/lb_details_description_body_text_size" />
+        app:layout_goneMarginLeft="@dimen/lb_details_description_title_line_spacing" />
 
 </android.support.constraint.ConstraintLayout>
+
