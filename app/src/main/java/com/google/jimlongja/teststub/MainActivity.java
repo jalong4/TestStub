@@ -1,9 +1,13 @@
 package com.google.jimlongja.teststub;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Point;
 import android.hardware.display.DisplayManager;
+import android.media.MediaDrm;
+import android.media.UnsupportedSchemeException;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -13,10 +17,15 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
+
+import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
+
 
 import static android.text.TextUtils.split;
 
@@ -36,11 +45,19 @@ public class MainActivity extends Activity {
     TextView mTextVendorPropWidth;
     TextView mTextVendorPropHeight;
 
+    Button mBtnGetDrmInfo;
+    TextView mTextMaxHdcpLevel;
+    TextView mTextConnectedHdcpLevel;
+    TextView mTextMaxSessions;
+    TextView mTextConnectedSessions;
+
     private static final String TAG = "TestStub";
     private static final String ANDROID_SYSTEM_PROPERTIES_CLASS = "android.os.SystemProperties";
     private static final String SYS_DISPLAY_SIZE = "sys.display-size";
     private static final String VENDOR_DISPLAY_SIZE = "vendor.display-size";
     private static final UUID WIDEVINE_UUID = new UUID(0xEDEF8BA979D64ACEL, 0xA3C827DCD51D21EDL);
+    private List<String> hdcpLevels = Arrays.asList("UNKNOWN", "HDCP_NONE", "HDCP_V1", "HDCP_V2", "HDCP_V2_1", "HDCP_V2_2");
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,10 +78,21 @@ public class MainActivity extends Activity {
         mTextVendorPropWidth = (TextView) findViewById(R.id.text_vendorPropWidth);
         mTextVendorPropHeight = (TextView) findViewById(R.id.text_vendorPropHeight);
 
+        mBtnGetDrmInfo = (Button) findViewById(R.id.button_getDrmInfo);
+        mTextMaxHdcpLevel = (TextView) findViewById(R.id.text_maxHdcpLevel);
+        mTextConnectedHdcpLevel = (TextView) findViewById(R.id.text_connectedHdcpLevel);
+        mTextMaxSessions = (TextView) findViewById(R.id.text_maxSessions);
+        mTextConnectedSessions = (TextView) findViewById(R.id.text_connectedSessions);
+
         mBtnCallAPI.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                callDisplayModeAPI();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        callDisplayModeAPI();
+                    }
+                });
             }
         });
 
@@ -72,7 +100,12 @@ public class MainActivity extends Activity {
         mBtnReadSysProp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                updateSystemProperties();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateSystemProperties();
+                    }
+                });
             }
         });
 
@@ -80,13 +113,36 @@ public class MainActivity extends Activity {
         mBtnReadVendorProp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateVendorProperties();
+                    }
+                });
+            }
+        });
 
+        mBtnGetDrmInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (Build.VERSION.SDK_INT >= 28) {
+                            getDrmInfo();
+                        }
+                    }
+                });
             }
         });
 
         callDisplayModeAPI();
         updateSystemProperties();
         updateVendorProperties();
+
+        if (Build.VERSION.SDK_INT >= 28) {
+            getDrmInfo();
+        }
 
     }
 
@@ -124,6 +180,35 @@ public class MainActivity extends Activity {
 
     public Display.Mode getMaxDisplayMode() {
         return getWindowManager().getDefaultDisplay().getMode();
+    }
+
+
+    public void getDrmInfo() {
+        MediaDrm drm = null;
+
+        try {
+            drm = new MediaDrm(WIDEVINE_UUID);
+
+            int connectedLevel = drm.getConnectedHdcpLevel();
+            int maxLevel = drm.getMaxHdcpLevel();
+            int maxSessionCount = drm.getMaxSessionCount();
+            int openSessionCount = drm.getOpenSessionCount();
+
+            mTextMaxHdcpLevel.setText("Max HDCP Level\n" + hdcpLevels.get(maxLevel));
+            mTextConnectedHdcpLevel.setText("Connected HDCP Level\n" + hdcpLevels.get(connectedLevel));
+            mTextMaxSessions.setText("Max Sessions\n" + Integer.toString(maxSessionCount));
+            mTextConnectedSessions.setText("Connected Sessions\n" + Integer.toString(openSessionCount));
+            Log.i(TAG, "Max HDCP Level: " + hdcpLevels.get(maxLevel) + " Connected HDCP Level: " + hdcpLevels.get(connectedLevel) + "\n");
+            Log.i(TAG, "Max Sessions: " + Integer.toString(maxSessionCount) + " Connected Sessions: " + Integer.toString(openSessionCount) + "\n");
+
+        } catch(Exception e) {
+            throw new Error("Unexpected exception ", e);
+        } finally {
+            if (drm != null) {
+                drm.close();
+            }
+        }
+
     }
 
     public Point getDisplaySizeFromProperties(String prop) {
