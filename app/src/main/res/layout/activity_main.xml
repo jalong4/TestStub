@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="@dimen/lb_browse_rows_margin_top"
+    android:paddingTop="100dp"
     android:paddingLeft="50dp"
     tools:context=".MainActivity">
 
@@ -160,6 +160,29 @@
         app:layout_constraintLeft_toRightOf="@id/text_maxSessions"
         app:layout_constraintTop_toTopOf="@+id/button_getDrmInfo"
         app:layout_goneMarginLeft="@dimen/lb_details_description_title_line_spacing" />
+
+    <Button
+        android:id="@+id/button_deepLinkToStorageSettings"
+        android:layout_width="120dp"
+        android:layout_height="60dp"
+        android:text="Storage Settings"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_getDrmInfo" />
+
+    <Button
+        android:id="@+id/button_deepLinkToAddAccessory"
+        android:layout_width="120dp"
+        android:layout_height="60dp"
+        android:text="Add Accessories"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_deepLinkToStorageSettings" />
+
+    <Button
+        android:id="@+id/button_launchNetflix"
+        android:layout_width="120dp"
+        android:layout_height="60dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_deepLinkToAddAccessory" />
 
 </android.support.constraint.ConstraintLayout>
 

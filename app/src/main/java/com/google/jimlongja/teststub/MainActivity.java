@@ -3,7 +3,9 @@ package com.google.jimlongja.teststub;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Point;
+import android.graphics.drawable.Drawable;
 import android.hardware.display.DisplayManager;
 import android.media.MediaDrm;
 import android.media.UnsupportedSchemeException;
@@ -51,6 +53,12 @@ public class MainActivity extends Activity {
     TextView mTextMaxSessions;
     TextView mTextConnectedSessions;
 
+    Button mBtnDeepLinkToStorageSettings;
+    Button mBtnDeepLinkToAddAccessories;
+    Button mBtnLaunchNetflix;
+
+    Intent mNetflixIntent;
+
     private static final String TAG = "TestStub";
     private static final String ANDROID_SYSTEM_PROPERTIES_CLASS = "android.os.SystemProperties";
     private static final String SYS_DISPLAY_SIZE = "sys.display-size";
@@ -83,6 +91,22 @@ public class MainActivity extends Activity {
         mTextConnectedHdcpLevel = (TextView) findViewById(R.id.text_connectedHdcpLevel);
         mTextMaxSessions = (TextView) findViewById(R.id.text_maxSessions);
         mTextConnectedSessions = (TextView) findViewById(R.id.text_connectedSessions);
+
+        mBtnDeepLinkToStorageSettings = (Button) findViewById(R.id.button_deepLinkToStorageSettings);
+        mBtnDeepLinkToAddAccessories = (Button) findViewById(R.id.button_deepLinkToAddAccessory);
+        mBtnLaunchNetflix = (Button) findViewById(R.id.button_launchNetflix);
+        mNetflixIntent = getPackageManager().getLaunchIntentForPackage("com.netflix.ninja");
+
+        try {
+            Drawable logo = getPackageManager().getActivityLogo(mNetflixIntent);
+            mBtnLaunchNetflix.setBackground(logo);
+            Log.i(TAG, "Got Netflix logo\n");
+
+        } catch(Exception e) {
+            throw new Error("Unexpected exception ", e);
+        }
+
+
 
         mBtnCallAPI.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -136,6 +160,31 @@ public class MainActivity extends Activity {
             }
         });
 
+        mBtnDeepLinkToStorageSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        startActivityForResult(new Intent(android.provider.Settings.ACTION_INTERNAL_STORAGE_SETTINGS), 0);
+                    }
+                });
+            }
+        });
+
+        mBtnLaunchNetflix.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        startActivity(mNetflixIntent);
+                    }
+                });
+            }
+        });
+
+
         callDisplayModeAPI();
         updateSystemProperties();
         updateVendorProperties();
@@ -178,7 +227,7 @@ public class MainActivity extends Activity {
         return result;
     }
 
-    public Display.Mode getMaxDisplayMode() {
+    public Display.Mode .Mode getMaxDisplayMode() {
         return getWindowManager().getDefaultDisplay().getMode();
     }
 
@@ -245,5 +294,11 @@ public class MainActivity extends Activity {
 
 
     }
+
+    private void linkToIntent(String intentName) {
+        startActivityForResult(new Intent(android.provider.Settings.ACTION_SETTINGS), 0);
+    }
+
+
 
 }
