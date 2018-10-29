@@ -1,33 +1,27 @@
 package com.google.jimlongja.teststub;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
-import android.hardware.display.DisplayManager;
+import android.media.AudioDeviceCallback;
+import android.media.AudioDeviceInfo;
+import android.media.AudioManager;
 import android.media.MediaDrm;
-import android.media.UnsupportedSchemeException;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
-import java.lang.annotation.Target;
 import java.lang.reflect.Method;
-
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 import java.util.UUID;
-
 
 import static android.text.TextUtils.split;
 
@@ -56,6 +50,11 @@ public class MainActivity extends Activity {
     Button mBtnDeepLinkToStorageSettings;
     Button mBtnDeepLinkToAddAccessories;
     Button mBtnLaunchNetflix;
+
+    private HdmiReceiver mHdmiReceiver;
+
+    private AudioManager mAudioManager;
+    private AudioDeviceCallback mAudioDeviceCallback;
 
     Intent mNetflixIntent;
 
@@ -105,6 +104,33 @@ public class MainActivity extends Activity {
         } catch(Exception e) {
             throw new Error("Unexpected exception ", e);
         }
+
+        HdmiReceiver.HdmiListener listener = new HdmiReceiver.HdmiListener() {
+            @Override
+            public void onHdmiPluggedState(boolean plugged, String action, String extras) {
+                Log.i(TAG, "Received Action: " + action + "\n");
+                Log.i(TAG, plugged ? "HDMI connected" : "HDMI disconnected");
+                Log.i(TAG, extras);
+
+            }
+        };
+        mHdmiReceiver = new HdmiReceiver(this, listener) ;
+
+        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+
+        mAudioDeviceCallback = new AudioDeviceCallback() {
+            @Override
+            public void onAudioDevicesAdded(AudioDeviceInfo[] addedDevices) {
+                super.onAudioDevicesAdded(addedDevices);
+                Log.i(TAG, "onAudioDevicesAdded hit");
+            }
+
+            @Override
+            public void onAudioDevicesRemoved(AudioDeviceInfo[] removedDevices) {
+                super.onAudioDevicesRemoved(removedDevices);
+                Log.i(TAG, "onAudioDevicesRemoved hit");
+            }
+        };
 
 
 
@@ -193,6 +219,18 @@ public class MainActivity extends Activity {
             getDrmInfo();
         }
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mHdmiReceiver.register();
+    }
+
+    @Override
+    protected void onStop() {
+        mHdmiReceiver.unregister();
+        super.onStop();
     }
 
     public void callDisplayModeAPI() {
