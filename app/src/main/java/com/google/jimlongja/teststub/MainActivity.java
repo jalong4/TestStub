@@ -227,7 +227,7 @@ public class MainActivity extends Activity {
         return result;
     }
 
-    public Display.Mode .Mode getMaxDisplayMode() {
+    public Display.Mode getMaxDisplayMode() {
         return getWindowManager().getDefaultDisplay().getMode();
     }
 
