@@ -116,6 +116,17 @@ public class MainActivity extends Activity {
         };
         mHdmiReceiver = new HdmiReceiver(this, listener) ;
 
+//        HdmiControlManager hdmiControlManager =
+//                (HdmiControlManager) getSystemService(Context.HDMI_CONTROL_SERVICE);
+//        if (hdmiControlManager != null) {
+//            hdmiControlManager.addHotplugEventListener(new HotplugEventListener() {
+//                @Override
+//                public void onReceived(HdmiHotplugEvent hdmiHotplugEvent) {
+//                    // do something
+//                }
+//            });
+//        }
+
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
         mAudioDeviceCallback = new AudioDeviceCallback() {
