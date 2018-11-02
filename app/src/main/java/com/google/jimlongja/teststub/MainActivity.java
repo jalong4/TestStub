@@ -9,6 +9,8 @@ import android.media.AudioDeviceCallback;
 import android.media.AudioDeviceInfo;
 import android.media.AudioManager;
 import android.media.MediaDrm;
+import android.content.pm.PackageManager;
+
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -23,6 +25,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+
+import static android.content.pm.PackageManager.FEATURE_VERIFIED_BOOT;
 import static android.text.TextUtils.split;
 
 public class MainActivity extends Activity {
@@ -47,7 +51,8 @@ public class MainActivity extends Activity {
     TextView mTextMaxSessions;
     TextView mTextConnectedSessions;
 
-    Button mBtnDeepLinkToStorageSettings;
+    Button mBtnHasVerifiedBoot;
+    TextView mTextHasVerifiedBoot;
     Button mBtnDeepLinkToAddAccessories;
     Button mBtnLaunchNetflix;
 
@@ -91,7 +96,8 @@ public class MainActivity extends Activity {
         mTextMaxSessions = (TextView) findViewById(R.id.text_maxSessions);
         mTextConnectedSessions = (TextView) findViewById(R.id.text_connectedSessions);
 
-        mBtnDeepLinkToStorageSettings = (Button) findViewById(R.id.button_deepLinkToStorageSettings);
+        mBtnHasVerifiedBoot = (Button) findViewById(R.id.button_has_verified_boot);
+        mTextHasVerifiedBoot = (TextView) findViewById(R.id.text_has_verified_boot);
         mBtnDeepLinkToAddAccessories = (Button) findViewById(R.id.button_deepLinkToAddAccessory);
         mBtnLaunchNetflix = (Button) findViewById(R.id.button_launchNetflix);
         mNetflixIntent = getPackageManager().getLaunchIntentForPackage("com.netflix.ninja");
@@ -101,20 +107,20 @@ public class MainActivity extends Activity {
             mBtnLaunchNetflix.setBackground(logo);
             Log.i(TAG, "Got Netflix logo\n");
 
-        } catch(Exception e) {
-            throw new Error("Unexpected exception ", e);
+        } catch (Exception e) {
+            Log.i(TAG, "Netflix not installed");
         }
 
         HdmiReceiver.HdmiListener listener = new HdmiReceiver.HdmiListener() {
             @Override
-            public void onHdmiPluggedState(boolean plugged, String action, String extras) {
-                Log.i(TAG, "Received Action: " + action + "\n");
+            public void onHdmiPluggedState(boolean plugged, Intent intent) {
+                Log.i(TAG, "Received Action: " + intent.getAction() + "\n");
                 Log.i(TAG, plugged ? "HDMI connected" : "HDMI disconnected");
-                Log.i(TAG, extras);
+                Log.i(TAG, HdmiReceiver.dumpIntent(intent));
 
             }
         };
-        mHdmiReceiver = new HdmiReceiver(this, listener) ;
+        mHdmiReceiver = new HdmiReceiver(this, listener);
 
 //        HdmiControlManager hdmiControlManager =
 //                (HdmiControlManager) getSystemService(Context.HDMI_CONTROL_SERVICE);
@@ -142,7 +148,6 @@ public class MainActivity extends Activity {
                 Log.i(TAG, "onAudioDevicesRemoved hit");
             }
         };
-
 
 
         mBtnCallAPI.setOnClickListener(new View.OnClickListener() {
@@ -197,13 +202,13 @@ public class MainActivity extends Activity {
             }
         });
 
-        mBtnDeepLinkToStorageSettings.setOnClickListener(new View.OnClickListener() {
+        mBtnHasVerifiedBoot.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        startActivityForResult(new Intent(android.provider.Settings.ACTION_INTERNAL_STORAGE_SETTINGS), 0);
+                        mTextHasVerifiedBoot.setText(hasVerifiedBoot() ? "\nYes" : "\nNo");
                     }
                 });
             }
@@ -244,6 +249,10 @@ public class MainActivity extends Activity {
         super.onStop();
     }
 
+    Boolean hasVerifiedBoot() {
+        return getPackageManager().hasSystemFeature(FEATURE_VERIFIED_BOOT);
+    }
+
     public void callDisplayModeAPI() {
         Display.Mode mode = getMaxDisplayMode();
         mTextWidth.setText("Width\n" + Integer.toString(mode.getPhysicalWidth()));
@@ -267,7 +276,7 @@ public class MainActivity extends Activity {
         Log.i(TAG, VENDOR_DISPLAY_SIZE + ": width=" + Integer.toString(displaySize.x) + " height=" + Integer.toString(displaySize.y) + "\n");
     }
 
-    public boolean isUHD(){
+    public boolean isUHD() {
         return isUHD(getMaxDisplayMode());
     }
 
@@ -299,7 +308,7 @@ public class MainActivity extends Activity {
             Log.i(TAG, "Max HDCP Level: " + hdcpLevels.get(maxLevel) + " Connected HDCP Level: " + hdcpLevels.get(connectedLevel) + "\n");
             Log.i(TAG, "Max Sessions: " + Integer.toString(maxSessionCount) + " Connected Sessions: " + Integer.toString(openSessionCount) + "\n");
 
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new Error("Unexpected exception ", e);
         } finally {
             if (drm != null) {
@@ -347,7 +356,6 @@ public class MainActivity extends Activity {
     private void linkToIntent(String intentName) {
         startActivityForResult(new Intent(android.provider.Settings.ACTION_SETTINGS), 0);
     }
-
 
 
 }

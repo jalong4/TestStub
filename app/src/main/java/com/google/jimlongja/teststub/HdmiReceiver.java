@@ -15,11 +15,9 @@ public final class HdmiReceiver extends BroadcastReceiver {
      * Hdmi listener.
      */
     public interface HdmiListener {
-        void onHdmiPluggedState(boolean plugged, String action, String extras);
+        void onHdmiPluggedState(boolean plugged, Intent intent);
     }
 
-    public static final String ACTION_HDMI_MODE_CHANGED     = "droidlogic.intent.action.HDMI_MODE_CHANGED";
-    public static final String EXTRA_HDMI_MODE              = "mode";
 
     public static final String ACTION_HDMI_PLUGGED = "android.intent.action.HDMI_PLUGGED";
     public static final String EXTRA_HDMI_PLUGGED_STATE = "state";
@@ -37,7 +35,6 @@ public final class HdmiReceiver extends BroadcastReceiver {
         this.context = context;
         this.listener = listener;
         this.intentFilter.addAction(ACTION_HDMI_PLUGGED);
-        this.intentFilter.addAction(ACTION_HDMI_MODE_CHANGED);
     }
 
     @Override
@@ -46,15 +43,7 @@ public final class HdmiReceiver extends BroadcastReceiver {
 
         if (ACTION_HDMI_PLUGGED.equals(action)) {
             hdmiPlugged = intent.getBooleanExtra(EXTRA_HDMI_PLUGGED_STATE, false);
-            listener.onHdmiPluggedState(hdmiPlugged, action, dumpIntent(intent));
-        } else if (ACTION_HDMI_MODE_CHANGED.equals(action)) {
-            String newMode = intent.getStringExtra(EXTRA_HDMI_MODE);
-            if (newMode.isEmpty()) {
-                return;
-            }
-            hdmiPlugged = newMode.equals("connected");
-            hdmiPlugged = false;
-            listener.onHdmiPluggedState(hdmiPlugged, action, dumpIntent(intent));
+            listener.onHdmiPluggedState(hdmiPlugged, intent);
         }
     }
 
@@ -77,7 +66,7 @@ public final class HdmiReceiver extends BroadcastReceiver {
         return hdmiPlugged;
     }
 
-    public String dumpIntent(Intent i){
+    static public String dumpIntent(Intent i){
 
         Bundle bundle = i.getExtras();
         String extras = "";

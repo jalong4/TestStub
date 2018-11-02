@@ -162,12 +162,22 @@
         app:layout_goneMarginLeft="@dimen/lb_details_description_title_line_spacing" />
 
     <Button
-        android:id="@+id/button_deepLinkToStorageSettings"
+        android:id="@+id/button_has_verified_boot"
         android:layout_width="120dp"
         android:layout_height="60dp"
-        android:text="Storage Settings"
+        android:text="Verified Boot"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button_getDrmInfo" />
+
+    <TextView
+        android:id="@+id/text_has_verified_boot"
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:text="\nUnknown"
+        android:textAlignment="center"
+        app:layout_constraintLeft_toRightOf="@id/button_has_verified_boot"
+        app:layout_constraintTop_toTopOf="@+id/button_has_verified_boot"
+        app:layout_goneMarginLeft="@dimen/lb_details_description_title_line_spacing" />
 
     <Button
         android:id="@+id/button_deepLinkToAddAccessory"
@@ -175,7 +185,7 @@
         android:layout_height="60dp"
         android:text="Add Accessories"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_deepLinkToStorageSettings" />
+        app:layout_constraintTop_toBottomOf="@+id/button_has_verified_boot" />
 
     <Button
         android:id="@+id/button_launchNetflix"
