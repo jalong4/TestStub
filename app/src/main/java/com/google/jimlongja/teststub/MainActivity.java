@@ -9,7 +9,6 @@ import android.media.AudioDeviceCallback;
 import android.media.AudioDeviceInfo;
 import android.media.AudioManager;
 import android.media.MediaDrm;
-import android.content.pm.PackageManager;
 
 import android.os.Build;
 import android.os.Bundle;
@@ -202,6 +201,8 @@ public class MainActivity extends Activity {
             }
         });
 
+
+        mTextHasVerifiedBoot.setText(hasVerifiedBoot() ? "\nYes" : "\nNo");
         mBtnHasVerifiedBoot.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
