@@ -35,6 +35,7 @@ public final class HdmiReceiver extends BroadcastReceiver {
         this.context = context;
         this.listener = listener;
         this.intentFilter.addAction(ACTION_HDMI_PLUGGED);
+        // this.intentFilter.addAction(ACTION_SYSTEM_CONTROL_EVENT);
     }
 
     @Override
@@ -44,6 +45,9 @@ public final class HdmiReceiver extends BroadcastReceiver {
         if (ACTION_HDMI_PLUGGED.equals(action)) {
             hdmiPlugged = intent.getBooleanExtra(EXTRA_HDMI_PLUGGED_STATE, false);
             listener.onHdmiPluggedState(hdmiPlugged, intent);
+        // } else if (ACTION_SYSTEM_CONTROL_EVENT.equals(action)) {
+        //     hdmiPlugged = false;
+        //     listener.onHdmiPluggedState(hdmiPlugged, intent);
         }
     }
 
