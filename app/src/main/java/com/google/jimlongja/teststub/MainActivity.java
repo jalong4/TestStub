@@ -15,6 +15,7 @@ import android.media.MediaDrm.KeyStatus;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore.Audio.Media;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Display;
@@ -197,7 +198,7 @@ public class MainActivity extends Activity {
           @Override
           public void run() {
             if (Build.VERSION.SDK_INT >= 28) {
-              getDrmInfo();
+              setHdcpLabels(getDrmInfo());
             }
           }
         });
@@ -234,7 +235,8 @@ public class MainActivity extends Activity {
     updateVendorProperties();
 
     if (Build.VERSION.SDK_INT >= 28) {
-      getDrmInfo();
+      mMediaDrm = getDrmInfo();
+      setHdcpLabels(mMediaDrm);
       setDrmCallback();
     }
 
@@ -303,8 +305,16 @@ public class MainActivity extends Activity {
   }
 
   public boolean isUHD(Display.Mode mode) {
-    boolean result = (mode.getPhysicalWidth() >= 3840 && mode.getPhysicalHeight() >= 2160);
-    return result;
+    if (Build.VERSION.SDK_INT < 28) {  // can't determine hdcplevel
+      return false;
+    }
+
+    Point displaySize = getDisplaySizeFromProperties(VENDOR_DISPLAY_SIZE);
+    int hdcpLevel = getDrmInfo().getConnectedHdcpLevel();
+
+    boolean hasHDCPV2_2 = "HDCP_V2_2".equals(hdcpLevels.get(hdcpLevel));
+
+    return(displaySize.y >= 2160) && (displaySize.x >=3840) && (mode.getRefreshRate() >= 60.0) && hasHDCPV2_2;
   }
 
   public Display.Mode getMaxDisplayMode() {
@@ -312,27 +322,15 @@ public class MainActivity extends Activity {
   }
 
 
-  public void getDrmInfo() {
+  private MediaDrm getDrmInfo() {
 
+    if (Build.VERSION.SDK_INT < 28) {
+      return null;
+    }
+
+    MediaDrm mediaDrm = null;
     try {
-      mMediaDrm = new MediaDrm(WIDEVINE_UUID);
-
-      int connectedLevel = mMediaDrm.getConnectedHdcpLevel();
-      int maxLevel = mMediaDrm.getMaxHdcpLevel();
-      int maxSessionCount = mMediaDrm.getMaxSessionCount();
-      int openSessionCount = mMediaDrm.getOpenSessionCount();
-
-      mTextMaxHdcpLevel.setText("Max HDCP Level\n" + hdcpLevels.get(maxLevel));
-      mTextConnectedHdcpLevel.setText("Connected HDCP Level\n" + hdcpLevels.get(connectedLevel));
-      mTextMaxSessions.setText("Max Sessions\n" + Integer.toString(maxSessionCount));
-      mTextConnectedSessions.setText("Connected Sessions\n" + Integer.toString(openSessionCount));
-      Log.i(TAG,
-          "Max HDCP Level: " + hdcpLevels.get(maxLevel) + " Connected HDCP Level: " + hdcpLevels
-              .get(connectedLevel) + "\n");
-      Log.i(TAG,
-          "Max Sessions: " + Integer.toString(maxSessionCount) + " Connected Sessions: " + Integer
-              .toString(openSessionCount) + "\n");
-
+      mediaDrm = new MediaDrm(WIDEVINE_UUID);
     } catch (Exception e) {
       throw new Error("Unexpected exception ", e);
     } finally {
@@ -341,7 +339,36 @@ public class MainActivity extends Activity {
       }
     }
 
+    return mediaDrm;
+
   }
+
+  private void setHdcpLabels(MediaDrm mediaDrm) {
+
+    if (Build.VERSION.SDK_INT < 28) {
+      return;
+    }
+
+    mTextMaxHdcpLevel.setText("Max HDCP Level\n" + hdcpLevels.get(mediaDrm.getMaxHdcpLevel()));
+    mTextConnectedHdcpLevel.setText("Connected HDCP Level\n" + hdcpLevels.get(mediaDrm.getConnectedHdcpLevel()));
+    mTextMaxSessions.setText("Max Sessions\n" + Integer.toString(mediaDrm.getMaxSessionCount()));
+    mTextConnectedSessions.setText("Open Sessions\n" + Integer.toString(mediaDrm.getOpenSessionCount()));
+  }
+
+  private void logDrmInfo(MediaDrm mediaDrm) {
+
+    if (Build.VERSION.SDK_INT < 28) {
+      return;
+    }
+
+    Log.i(TAG,
+        "Max HDCP Level: " + hdcpLevels.get(mediaDrm.getMaxHdcpLevel()) + " Connected HDCP Level: " + hdcpLevels
+            .get(mediaDrm.getConnectedHdcpLevel()) + "\n");
+    Log.i(TAG,
+        "Max Sessions: " + Integer.toString(mediaDrm.getMaxSessionCount()) + " Connected Sessions: " + Integer
+            .toString(mediaDrm.getOpenSessionCount()) + "\n");
+  }
+
 
   public void setDrmCallback() {
     mMediaDrm.setOnKeyStatusChangeListener(new OnKeyStatusChangeListener() {
