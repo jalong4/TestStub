@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 'android-stable'
     defaultConfig {
         applicationId "com.google.jimlongja.teststub"
         minSdkVersion 26
@@ -18,7 +18,7 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:leanback-v17:26.+'
     implementation 'com.android.support:appcompat-v7:26.+'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
