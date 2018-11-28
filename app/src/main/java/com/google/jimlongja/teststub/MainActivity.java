@@ -53,6 +53,7 @@ public class MainActivity extends Activity {
   TextView mTextConnectedHdcpLevel;
   TextView mTextMaxSessions;
   TextView mTextConnectedSessions;
+  TextView mTextWidevineSystemId;
 
   Button mBtnHasVerifiedBoot;
   TextView mTextHasVerifiedBoot;
@@ -101,6 +102,7 @@ public class MainActivity extends Activity {
     mTextConnectedHdcpLevel = (TextView) findViewById(R.id.text_connectedHdcpLevel);
     mTextMaxSessions = (TextView) findViewById(R.id.text_maxSessions);
     mTextConnectedSessions = (TextView) findViewById(R.id.text_connectedSessions);
+    mTextWidevineSystemId = (TextView) findViewById(R.id.text_widevine_systemid);
 
     mBtnHasVerifiedBoot = (Button) findViewById(R.id.button_has_verified_boot);
     mTextHasVerifiedBoot = (TextView) findViewById(R.id.text_has_verified_boot);
@@ -234,11 +236,8 @@ public class MainActivity extends Activity {
     updateSystemProperties();
     updateVendorProperties();
 
-    if (Build.VERSION.SDK_INT >= 28) {
-      mMediaDrm = getDrmInfo();
-      setHdcpLabels(mMediaDrm);
-      setDrmCallback();
-    }
+    mMediaDrm = getDrmInfo();
+    setHdcpLabels(mMediaDrm);
 
   }
 
@@ -345,39 +344,32 @@ public class MainActivity extends Activity {
 
   private void setHdcpLabels(MediaDrm mediaDrm) {
 
-    if (Build.VERSION.SDK_INT < 28) {
-      return;
-    }
+    // to find list of properties, see //vendor/widevine/libwvdrmengine/mediadrm/src_hidl/WVDrmPlugin.cpp
 
-    mTextMaxHdcpLevel.setText("Max HDCP Level\n" + hdcpLevels.get(mediaDrm.getMaxHdcpLevel()));
-    mTextConnectedHdcpLevel.setText("Connected HDCP Level\n" + hdcpLevels.get(mediaDrm.getConnectedHdcpLevel()));
-    mTextMaxSessions.setText("Max Sessions\n" + Integer.toString(mediaDrm.getMaxSessionCount()));
-    mTextConnectedSessions.setText("Open Sessions\n" + Integer.toString(mediaDrm.getOpenSessionCount()));
+    String systemid = mediaDrm.getPropertyString("systemId");
+    String maxHdcpLevel = mediaDrm.getPropertyString("maxHdcpLevel");
+    String connectedHdcpLevel = mediaDrm.getPropertyString("hdcpLevel");
+    String maxSessions = mediaDrm.getPropertyString("maxNumberOfSessions");
+    String connectedSessions = mediaDrm.getPropertyString("numberOfOpenSessions");
+
+    mTextMaxHdcpLevel.setText("Max HDCP Level\n" + maxHdcpLevel);
+    mTextConnectedHdcpLevel.setText("Connected HDCP Level\n" + connectedHdcpLevel);
+    mTextMaxSessions.setText("Max Sessions\n" + maxSessions);
+    mTextConnectedSessions.setText("Open Sessions\n" + connectedSessions);
+    mTextWidevineSystemId.setText("System ID\n" + systemid);
+
   }
+
 
   private void logDrmInfo(MediaDrm mediaDrm) {
-
-    if (Build.VERSION.SDK_INT < 28) {
-      return;
-    }
-
-    Log.i(TAG,
-        "Max HDCP Level: " + hdcpLevels.get(mediaDrm.getMaxHdcpLevel()) + " Connected HDCP Level: " + hdcpLevels
-            .get(mediaDrm.getConnectedHdcpLevel()) + "\n");
-    Log.i(TAG,
-        "Max Sessions: " + Integer.toString(mediaDrm.getMaxSessionCount()) + " Connected Sessions: " + Integer
-            .toString(mediaDrm.getOpenSessionCount()) + "\n");
-  }
-
-
-  public void setDrmCallback() {
-    mMediaDrm.setOnKeyStatusChangeListener(new OnKeyStatusChangeListener() {
-      @Override
-      public void onKeyStatusChange(MediaDrm md, byte[] sessionId,
-          List<KeyStatus> keyInformation, boolean hasNewUsableKey) {
-        Log.i(TAG, "hit onKeyStatusChange\n");
-      }
-    }, null);
+    String systemid = mediaDrm.getPropertyString("systemId");
+    String maxHdcpLevel = mediaDrm.getPropertyString("maxHdcpLevel");
+    String connectedHdcpLevel = mediaDrm.getPropertyString("hdcpLevel");
+    String maxSessions = mediaDrm.getPropertyString("maxNumberOfSessions");
+    String connectedSessions = mediaDrm.getPropertyString("numberOfOpenSessions");
+    Log.i(TAG, "Max HDCP Level: " + maxHdcpLevel + " Connected HDCP Level: " + connectedHdcpLevel + "\n");
+    Log.i(TAG, "Max Sessions: " + maxSessions + " Connected Sessions: " + connectedSessions + "\n");
+    Log.i(TAG, "System Id: " + systemid + "\n");
   }
 
   private String getSystemProperty(String prop) {

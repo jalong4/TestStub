@@ -161,6 +161,17 @@
         app:layout_constraintTop_toTopOf="@+id/button_getDrmInfo"
         app:layout_goneMarginLeft="@dimen/lb_details_description_title_line_spacing" />
 
+
+    <TextView
+        android:id="@+id/text_widevine_systemid"
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:text="System ID\nUnknown"
+        android:textAlignment="center"
+        app:layout_constraintLeft_toRightOf="@id/text_connectedSessions"
+        app:layout_constraintTop_toTopOf="@+id/button_getDrmInfo"
+        app:layout_goneMarginLeft="@dimen/lb_details_description_title_line_spacing" />
+
     <Button
         android:id="@+id/button_has_verified_boot"
         android:layout_width="120dp"
