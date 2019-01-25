@@ -47,6 +47,7 @@ public class MainActivity extends Activity {
   Button mBtnReadVendorProp;
   TextView mTextVendorPropWidth;
   TextView mTextVendorPropHeight;
+  TextView mTextDerivedModelGroup;
 
   Button mBtnGetDrmInfo;
   TextView mTextMaxHdcpLevel;
@@ -96,6 +97,7 @@ public class MainActivity extends Activity {
     mBtnReadVendorProp = (Button) findViewById(R.id.button_getVendorProp);
     mTextVendorPropWidth = (TextView) findViewById(R.id.text_vendorPropWidth);
     mTextVendorPropHeight = (TextView) findViewById(R.id.text_vendorPropHeight);
+    mTextDerivedModelGroup = (TextView) findViewById(R.id.text_derived_model_group);
 
     mBtnGetDrmInfo = (Button) findViewById(R.id.button_getDrmInfo);
     mTextMaxHdcpLevel = (TextView) findViewById(R.id.text_maxHdcpLevel);
@@ -294,9 +296,26 @@ public class MainActivity extends Activity {
     Point displaySize = getDisplaySizeFromProperties(VENDOR_DISPLAY_SIZE);
     mTextVendorPropWidth.setText("Width\n" + Integer.toString(displaySize.x));
     mTextVendorPropHeight.setText("Height\n" + Integer.toString(displaySize.y));
+
+    setDerivedModelGroup();
+
     Log.i(TAG,
         VENDOR_DISPLAY_SIZE + ": width=" + Integer.toString(displaySize.x) + " height=" + Integer
             .toString(displaySize.y) + "\n");
+  }
+
+  public String getDerivedModelGroup() {
+
+    return getSystemProperty("ro.product.brand", "brand") + "-" +
+            getSystemProperty("ro.product.name", "name") + "-" +
+            getSystemProperty("ro.product.device", "device") + "-" +
+            getDrmInfo().getPropertyString("systemId") + "-" +
+            getSystemProperty("key-oem1", "operator");  // replace this with property that we set on first run.
+  }
+
+  public void setDerivedModelGroup() {
+    String derivedModelGroup = getDerivedModelGroup();
+    mTextDerivedModelGroup.setText("modelGroup\n" + derivedModelGroup);
   }
 
   public boolean isUHD() {
@@ -322,10 +341,6 @@ public class MainActivity extends Activity {
 
 
   private MediaDrm getDrmInfo() {
-
-    if (Build.VERSION.SDK_INT < 28) {
-      return null;
-    }
 
     MediaDrm mediaDrm = null;
     try {
@@ -373,13 +388,18 @@ public class MainActivity extends Activity {
   }
 
   private String getSystemProperty(String prop) {
+    return getSystemProperty(prop, "");
+  }
+
+  private String getSystemProperty(String prop, String defaultValue) {
     try {
       Class<?> systemProperties = Class.forName(ANDROID_SYSTEM_PROPERTIES_CLASS);
       Method getMethod = systemProperties.getMethod("get", String.class);
-      return (String) getMethod.invoke(systemProperties, prop);
+      String value = (String) getMethod.invoke(systemProperties, prop);
+      return "".equals(value) ? defaultValue : value;
     } catch (Exception e) {
       Log.e(TAG, "Failed to read " + prop, e);
-      return "";
+      return defaultValue;
     }
   }
 

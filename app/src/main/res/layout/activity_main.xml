@@ -113,6 +113,16 @@
         app:layout_constraintTop_toTopOf="@+id/button_getVendorProp"
         app:layout_goneMarginLeft="@dimen/lb_details_description_title_line_spacing" />
 
+    <TextView
+        android:id="@+id/text_derived_model_group"
+        android:layout_width="400dp"
+        android:layout_height="40dp"
+        android:text="modelGroup\nUnknown"
+        android:textAlignment="center"
+        app:layout_constraintLeft_toRightOf="@id/text_vendorPropWidth"
+        app:layout_constraintTop_toTopOf="@+id/button_getVendorProp"
+        app:layout_goneMarginLeft="@dimen/lb_details_description_title_line_spacing" />
+
     <Button
         android:id="@+id/button_getDrmInfo"
         android:layout_width="120dp"
